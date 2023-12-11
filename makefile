@@ -2,7 +2,7 @@ sourceFiles := time.c movement.c objects.c controls.c main.c
 buildDirectory := bin
 cStandard := c11
 defaultOptions := -std=$(cStandard) -fdiagnostics-color=always -g
-programName := main
+programName := No-DLLs
 compiler := gcc
 SHELL := /bin/bash
 

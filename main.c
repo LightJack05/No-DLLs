@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     }
 
     // Create window
-    SDL_Window *window = SDL_CreateWindow("SDL-Template",
+    SDL_Window *window = SDL_CreateWindow("No-DLLs",
                                           SDL_WINDOWPOS_UNDEFINED,
                                           SDL_WINDOWPOS_UNDEFINED,
                                           SCREEN_WIDTH, SCREEN_HEIGHT,
