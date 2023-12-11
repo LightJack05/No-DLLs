@@ -1,0 +1,19 @@
+{
+    "tasks": [
+        {
+            "label": "Make (Windows)",
+            "command": "make",
+            "args": [
+                "windows-sdl"
+            ]
+        },
+        {
+            "label": "Make (Linux)",
+            "command": "make",
+            "args": [
+                "linux"
+            ]
+        }
+    ],
+    "version": "2.0.0"
+}
