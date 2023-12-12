@@ -5,20 +5,21 @@
 
 void MovementTick()
 {
+
     if (Controls_DDown)
     {
-        player->x += 1 * Time_DeltaTime;
+        player->position_x += 1 * Time_DeltaTime;
     }
     if (Controls_WDown)
     {
-        player->y -= 1 * Time_DeltaTime;
+        player->position_y -= 1 * Time_DeltaTime;
     }
     if (Controls_SDown)
     {
-        player->y += 1 * Time_DeltaTime;
+        player->position_y += 1 * Time_DeltaTime;
     }
     if (Controls_ADown)
     {
-        player->x -= 1 * Time_DeltaTime;
+        player->position_x -= 1 * Time_DeltaTime;
     }
 }

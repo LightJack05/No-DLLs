@@ -1,4 +1,4 @@
-sourceFiles := time.c movement.c objects.c controls.c main.c
+sourceFiles := genericLinkedList.c update.c time.c movement.c objects.c controls.c main.c
 buildDirectory := bin
 cStandard := c11
 defaultOptions := -std=$(cStandard) -fdiagnostics-color=always -g
