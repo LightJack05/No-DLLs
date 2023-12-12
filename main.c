@@ -16,7 +16,7 @@ void mainLoop(SDL_Window *window, SDL_Renderer *renderer)
     bool quit = false;
     while (!quit)
     {
-
+        ResetKeyUpDown();
         SDL_Event e;
         while (SDL_PollEvent(&e))
         {
@@ -25,7 +25,7 @@ void mainLoop(SDL_Window *window, SDL_Renderer *renderer)
             {
                 quit = true;
             }
-            else if (e.type == SDL_KEYDOWN)
+            else if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
             {
                 Controls_KeyDown(e.key.keysym.sym);
             }

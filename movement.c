@@ -6,20 +6,26 @@
 void MovementTick()
 {
 
-    if (Controls_DDown)
+    if (Controls_D)
     {
-        player->position_x += 1 * Time_DeltaTime;
+        player->velocity_x = 0.5;
     }
+    if (Controls_DUp)
+    {
+        player->velocity_x = 0;
+    }
+
     if (Controls_WDown)
     {
-        player->position_y -= 1 * Time_DeltaTime;
+        player->velocity_y = -0.5;
     }
-    if (Controls_SDown)
+
+    if (Controls_A)
     {
-        player->position_y += 1 * Time_DeltaTime;
+        player->velocity_x = -0.5;
     }
-    if (Controls_ADown)
+    if (Controls_AUp)
     {
-        player->position_x -= 1 * Time_DeltaTime;
+        player->velocity_x = 0;
     }
 }

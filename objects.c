@@ -23,11 +23,11 @@ void initPlayer()
     player->object = playerRectangle;
     player->objectType = Rectangle;
 
-    playerRectangle->w = 100;
-    playerRectangle->h = 100;
+    playerRectangle->w = 20;
+    playerRectangle->h = 20;
 
     playerRectangle->x = (SCREEN_WIDTH / 2) - (playerRectangle->w / 2);
-    playerRectangle->y = (SCREEN_HEIGHT / 2) - (playerRectangle->h / 2);
+    playerRectangle->y = 40;
 
     player->position_x = playerRectangle->x;
     player->position_y = playerRectangle->y;
@@ -35,8 +35,16 @@ void initPlayer()
     player->width = playerRectangle->w;
     player->height = playerRectangle->h;
 
-    player->usesGravity = false;
-    player->isKinematic = false;
+    player->usesGravity = true;
+    player->gravityScale = 1;
+    player->isKinematic = true;
+    player->velocity_x = 0;
+    player->velocity_y = 0;
+
+    player->respectScreenEdgeBottom = true;
+    player->respectScreenEdgeTop = true;
+    player->respectScreenEdgeLeft = true;
+    player->respectScreenEdgeRight = true;
 
     player->color_r = 255;
     player->color_b = 0;

@@ -5,6 +5,7 @@
 #include "movement.h"
 #include "time.h"
 #include "math.h"
+#include "constants.h"
 
 void UpdateRenderer(SDL_Renderer *renderer)
 {
@@ -50,6 +51,8 @@ void UpdateSpritePositionsFromGameObjects()
     for (int i = 0; i < gameObjects->Length; i++)
     {
         GameObjectPtr currentGameObject = ((GameObjectPtr)(gameObjects->at(gameObjects, i)));
+        GravityTick(currentGameObject);
+        KinematicTick(currentGameObject);
 
         switch (currentGameObject->objectType)
         {
@@ -64,6 +67,54 @@ void UpdateSpritePositionsFromGameObjects()
 
         default:
             break;
+        }
+    }
+}
+
+void GravityTick(GameObject *currentGameObject)
+{
+    if (currentGameObject->usesGravity && currentGameObject->isKinematic)
+    {
+        currentGameObject->velocity_y += 0.001 * Time_DeltaTime * currentGameObject->gravityScale;
+    }
+}
+
+void KinematicTick(GameObject *currentGameObject)
+{
+    if (currentGameObject->isKinematic)
+    {
+
+        double nextYPosition = currentGameObject->position_y + currentGameObject->velocity_y * Time_DeltaTime;
+        double nextXPosition = currentGameObject->position_x + currentGameObject->velocity_x * Time_DeltaTime;
+
+        if ((nextXPosition > (SCREEN_WIDTH - (currentGameObject->width))) && currentGameObject->respectScreenEdgeRight)
+        {
+            currentGameObject->position_x = SCREEN_WIDTH - (currentGameObject->width);
+            currentGameObject->velocity_x = 0;
+        }
+        else if (nextXPosition < 0 && currentGameObject->respectScreenEdgeLeft)
+        {
+            currentGameObject->position_x = 0;
+            currentGameObject->velocity_x = 0;
+        }
+        else
+        {
+            currentGameObject->position_x = nextXPosition;
+        }
+
+        if ((nextYPosition > (SCREEN_HEIGHT - (currentGameObject->height))) && currentGameObject->respectScreenEdgeBottom)
+        {
+            currentGameObject->position_y = SCREEN_HEIGHT - (currentGameObject->height);
+            currentGameObject->velocity_y = 0;
+        }
+        else if (nextYPosition < 0 && currentGameObject->respectScreenEdgeTop)
+        {
+            currentGameObject->position_y = 0;
+            currentGameObject->velocity_y = 0;
+        }
+        else
+        {
+            currentGameObject->position_y = nextYPosition;
         }
     }
 }

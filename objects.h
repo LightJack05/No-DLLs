@@ -33,6 +33,11 @@ struct gameObject
     unsigned char color_g;
     unsigned char color_b;
 
+    bool respectScreenEdgeBottom;
+    bool respectScreenEdgeTop;
+    bool respectScreenEdgeRight;
+    bool respectScreenEdgeLeft;
+
     enum ObjectType objectType;
 
     void *object;
