@@ -9,6 +9,7 @@
 #include "update.h"
 #include "constants.h"
 #include "genericLinkedList.h"
+#include "gameCode.h"
 
 void mainLoop(SDL_Window *window, SDL_Renderer *renderer)
 {
@@ -36,7 +37,7 @@ void mainLoop(SDL_Window *window, SDL_Renderer *renderer)
         }
         ControlTick();
         UpdateRenderer(renderer);
-        // SDL_Delay(5);
+        SDL_Delay(5);
     }
 }
 

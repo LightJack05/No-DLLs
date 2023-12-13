@@ -7,7 +7,19 @@ void ControlTick()
 {
     if (Controls_SUp)
     {
-        DestroyObject(player);
+        for (int i = 0; i < 20000; i++)
+        {
+            GameObject *someNewRectangle = newRectangle();
+            someNewRectangle->width = 100;
+            someNewRectangle->height = 150;
+
+            someNewRectangle->color_b = 255;
+        }
+
+        for (int i = gameObjects->Length - 1; i > 0; i--)
+        {
+            DestroyObject(gameObjects->at(gameObjects, i));
+        }
     }
 
     if (Controls_D)

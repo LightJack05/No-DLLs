@@ -117,6 +117,11 @@
         free(this->ptrStart);                                                                                                                      \
         this->ptrStart = newStart;                                                                                                                 \
         this->Length--;                                                                                                                            \
+        if (this->Length == 0)                                                                                                                     \
+        {                                                                                                                                          \
+            this->ptrEnd = NULL;                                                                                                                   \
+            this->ptrStart = NULL;                                                                                                                 \
+        }                                                                                                                                          \
         return poppedData;                                                                                                                         \
     }                                                                                                                                              \
                                                                                                                                                    \
@@ -248,6 +253,7 @@
         newArray->Length = 0;                                                                                                                      \
         newArray->ptrStart = NULL;                                                                                                                 \
         newArray->ptrEnd = NULL;                                                                                                                   \
+        newArray->isEmpty = genericLinkedListIsEmpty##T;                                                                                           \
         newArray->at = genericLinkedListGetElementAtPosition##T;                                                                                   \
         newArray->fullElementAt = genericLinkedListGetFullElementAtPosition##T;                                                                    \
         newArray->pushBack = genericLinkedListPushBack##T;                                                                                         \
