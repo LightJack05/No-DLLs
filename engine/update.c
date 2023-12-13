@@ -146,6 +146,7 @@ void CollisionChecks(GameObject *object)
     check what kind of collision we have
         - border
         - corner
+    (Half movement every time, binary search.)
     Then invert the appropriate part of the velocity vector and possibly multiply the bounce variable.
     Block any further inversions of that vector part.
     */
