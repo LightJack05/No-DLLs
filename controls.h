@@ -4,6 +4,32 @@
 
 #include "SDL2/SDL.h"
 
+#define ExternKeyMapping(Key)       \
+    extern bool Controls_##Key;     \
+    extern bool Controls_##Key##Up; \
+    extern bool Controls_##Key##Down;
+
+#define KeyMapping(Key)      \
+    bool Controls_##Key;     \
+    bool Controls_##Key##Up; \
+    bool Controls_##Key##Down;
+
+#define KeyMappingSwitchCaseDown(Key, SDLKeyCode) \
+    case SDLKeyCode:                              \
+        Controls_##Key = true;                    \
+        Controls_##Key##Down = true;              \
+        Controls_##Key##Up = false;               \
+        break;
+
+#define KeyMappingSwitchCaseUp(Key, SDLKeyCode) \
+    case SDLKeyCode:                            \
+        Controls_##Key = false;                 \
+        Controls_##Key##Down = false;           \
+        Controls_##Key##Up = true;              \
+        break;
+
+ExternKeyMapping(Space);
+
 extern bool Controls_W;
 extern bool Controls_S;
 extern bool Controls_A;

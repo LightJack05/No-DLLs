@@ -1,6 +1,8 @@
 #include "controls.h"
 #include "SDL2/SDL.h"
 
+KeyMapping(Space);
+
 bool Controls_W = false;
 bool Controls_S = false;
 bool Controls_A = false;
@@ -40,6 +42,7 @@ void Controls_KeyDown(SDL_Keycode keycode)
         Controls_D = true;
         Controls_DUp = false;
         break;
+        KeyMappingSwitchCaseDown(Space, SDLK_SPACE);
     default:
         break;
     }
@@ -68,6 +71,7 @@ void Controls_KeyUp(SDL_Keycode keycode)
         Controls_D = false;
         Controls_DDown = false;
         break;
+        KeyMappingSwitchCaseUp(Space, SDLK_SPACE);
     default:
         break;
     }

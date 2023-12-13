@@ -15,7 +15,7 @@ void MovementTick()
         player->velocity_x = 0;
     }
 
-    if (Controls_WDown)
+    if (Controls_WDown || Controls_SpaceDown)
     {
         player->velocity_y = -0.5;
     }
