@@ -36,6 +36,7 @@ void mainLoop(SDL_Window *window, SDL_Renderer *renderer)
         }
         MovementTick();
         UpdateRenderer(renderer);
+        SDL_Delay(5);
     }
 }
 

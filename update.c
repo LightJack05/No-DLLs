@@ -42,8 +42,6 @@ void UpdateRenderer(SDL_Renderer *renderer)
 
     // Update screen
     SDL_RenderPresent(renderer);
-
-    SDL_Delay(10);
 }
 
 void UpdateSpritePositionsFromGameObjects()
