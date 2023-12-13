@@ -1,8 +1,8 @@
 #include "gameCode.h"
-#include "constants.h"
+#include "engine/constants.h"
 #include "SDL2/SDL.h"
-#include "objects.h"
-#include "keyboardHandling.h"
+#include "engine/objects.h"
+#include "engine/keyboardHandling.h"
 
 GameObject *player;
 

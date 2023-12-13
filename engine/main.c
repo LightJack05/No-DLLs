@@ -8,7 +8,7 @@
 #include "update.h"
 #include "constants.h"
 #include "genericLinkedList.h"
-#include "gameCode.h"
+#include "../gameCode.h"
 
 void MainLoop(SDL_Window *window, SDL_Renderer *renderer)
 {
