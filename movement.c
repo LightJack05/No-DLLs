@@ -1,10 +1,14 @@
 #include "movement.h"
-#include "controls.h"
+#include "keyboardHandling.h"
 #include "objects.h"
 #include "time.h"
 
-void MovementTick()
+void ControlTick()
 {
+    if (Controls_SUp)
+    {
+        DestroyObject(player);
+    }
 
     if (Controls_D)
     {

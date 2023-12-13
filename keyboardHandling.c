@@ -1,4 +1,4 @@
-#include "controls.h"
+#include "keyboardHandling.h"
 #include "SDL2/SDL.h"
 
 KeyMapping(Space);

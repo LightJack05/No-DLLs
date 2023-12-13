@@ -1,6 +1,6 @@
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
-void MovementTick();
+void ControlTick();
 
 #endif // MOVEMENT_H

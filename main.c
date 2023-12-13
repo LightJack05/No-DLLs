@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "SDL2/SDL.h"
-#include "controls.h"
+#include "keyboardHandling.h"
 #include "objects.h"
 #include "movement.h"
 #include "time.h"
@@ -34,9 +34,9 @@ void mainLoop(SDL_Window *window, SDL_Renderer *renderer)
                 Controls_KeyUp(e.key.keysym.sym);
             }
         }
-        MovementTick();
+        ControlTick();
         UpdateRenderer(renderer);
-        SDL_Delay(5);
+        // SDL_Delay(5);
     }
 }
 
