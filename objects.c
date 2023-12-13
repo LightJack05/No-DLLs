@@ -5,11 +5,9 @@
 #include "constants.h"
 #include "genericLinkedList.h"
 
-GameObject *player;
-
 struct GenericLinkedList(voidPtr) * gameObjects;
 
-GameObject *newRectangle()
+GameObject *NewRectangle()
 {
     GameObject *newObject = malloc(sizeof(GameObject));
     SDL_Rect *newObjectObject = malloc(sizeof(SDL_Rect));
@@ -47,29 +45,9 @@ GameObject *newRectangle()
     return newObject;
 }
 
-void initObjects()
+void InitObjects()
 {
     gameObjects = newGenericLinkedList(voidPtr);
-
-    initPlayer();
-}
-
-void initPlayer()
-{
-    player = newRectangle();
-
-    player->width = 20;
-    player->height = 20;
-
-    player->position_x = (SCREEN_WIDTH / 2) - (player->width / 2);
-    player->position_y = 40;
-
-    player->usesGravity = true;
-    player->isKinematic = true;
-
-    player->color_r = 255;
-    player->color_b = 0;
-    player->color_g = 0;
 }
 
 void DestroyObject(GameObject *object)

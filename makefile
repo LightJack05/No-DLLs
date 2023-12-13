@@ -1,4 +1,4 @@
-sourceFiles := genericLinkedList.c update.c time.c movement.c objects.c keyboardHandling.c main.c
+sourceFiles := gameCode.c genericLinkedList.c update.c time.c objects.c keyboardHandling.c main.c
 buildDirectory := bin
 cStandard := c11
 defaultOptions := -std=$(cStandard) -fdiagnostics-color=always -Wall -g

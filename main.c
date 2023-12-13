@@ -4,16 +4,15 @@
 #include "SDL2/SDL.h"
 #include "keyboardHandling.h"
 #include "objects.h"
-#include "movement.h"
 #include "time.h"
 #include "update.h"
 #include "constants.h"
 #include "genericLinkedList.h"
 #include "gameCode.h"
 
-void mainLoop(SDL_Window *window, SDL_Renderer *renderer)
+void MainLoop(SDL_Window *window, SDL_Renderer *renderer)
 {
-
+    Start();
     bool quit = false;
     while (!quit)
     {
@@ -35,7 +34,7 @@ void mainLoop(SDL_Window *window, SDL_Renderer *renderer)
                 Controls_KeyUp(e.key.keysym.sym);
             }
         }
-        ControlTick();
+        Update();
         UpdateRenderer(renderer);
         SDL_Delay(5);
     }
@@ -61,8 +60,8 @@ int main(int argc, char *argv[])
         SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
         if (renderer)
         {
-            initObjects();
-            mainLoop(window, renderer);
+            InitObjects();
+            MainLoop(window, renderer);
             SDL_DestroyRenderer(renderer);
         }
         SDL_DestroyWindow(window);

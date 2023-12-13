@@ -1,3 +1,8 @@
 {
     "C_Cpp.errorSquiggles": "enabledIfIncludesResolve",
+    "files.associations": {
+        "*.ham": "python",
+        "*.dd": "duckyscript",
+        "keyboardhandling.h": "c"
+    },
 }

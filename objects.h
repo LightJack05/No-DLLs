@@ -45,10 +45,10 @@ struct gameObject
 
 typedef GameObject *GameObjectPtr;
 
-GameObject *newRectangle();
+GameObject *NewRectangle();
 
-void initObjects();
-void initPlayer();
+void InitObjects();
+void InitPlayer();
 void DestroyObject(GameObject *object);
 
 #endif // OBJECTS_H
