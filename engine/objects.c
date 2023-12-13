@@ -32,6 +32,9 @@ GameObject *NewRectangle()
     newObject->velocity_x = 0;
     newObject->velocity_y = 0;
 
+    newObject->hasCollider = false;
+    newObject->bounciness = 0;
+
     newObject->respectScreenEdgeBottom = true;
     newObject->respectScreenEdgeTop = true;
     newObject->respectScreenEdgeLeft = true;

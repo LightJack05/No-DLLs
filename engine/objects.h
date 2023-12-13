@@ -29,6 +29,9 @@ struct gameObject
     double velocity_x;
     double velocity_y;
 
+    bool hasCollider;
+    double bounciness;
+
     unsigned char color_r;
     unsigned char color_g;
     unsigned char color_b;

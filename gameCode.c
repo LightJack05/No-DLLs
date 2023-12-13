@@ -3,12 +3,14 @@
 #include "SDL2/SDL.h"
 #include "engine/objects.h"
 #include "engine/keyboardHandling.h"
+#include "engine/constants.h"
 
 GameObject *player;
 
 void Start()
 {
     InitPlayer();
+    CreateFloor();
 }
 
 /// @brief Update will run every Frame.
@@ -29,10 +31,19 @@ void InitPlayer()
 
     player->usesGravity = true;
     player->isKinematic = true;
+    player->hasCollider = true;
 
     player->color_r = 255;
-    player->color_b = 0;
-    player->color_g = 0;
+}
+
+void CreateFloor()
+{
+    GameObject *floor = NewRectangle();
+    floor->hasCollider = true;
+    floor->color_b = 255;
+    floor->width = SCREEN_WIDTH;
+    floor->height = 20;
+    floor->position_y = SCREEN_HEIGHT - floor->height;
 }
 
 void ControlMovements()

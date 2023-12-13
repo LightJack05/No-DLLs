@@ -48,6 +48,12 @@ void UpdateSpritePositionsFromGameObjects()
     for (int i = 0; i < gameObjects->Length; i++)
     {
         GameObjectPtr currentGameObject = ((GameObjectPtr)(gameObjects->at(gameObjects, i)));
+        CollisionChecks(currentGameObject);
+    }
+
+    for (int i = 0; i < gameObjects->Length; i++)
+    {
+        GameObjectPtr currentGameObject = ((GameObjectPtr)(gameObjects->at(gameObjects, i)));
         GravityTick(currentGameObject);
         KinematicTick(currentGameObject);
 
@@ -112,6 +118,63 @@ void KinematicTick(GameObject *currentGameObject)
         else
         {
             currentGameObject->position_y = nextYPosition;
+        }
+    }
+}
+
+void CollisionChecks(GameObject *object)
+{
+    double nextYPositionTL = object->position_y + object->velocity_y * Time_DeltaTime;
+    double nextXPositionTL = object->position_x + object->velocity_x * Time_DeltaTime;
+
+    double nextYPositionTR = nextYPositionTL;
+    double nextXPositionTR = nextXPositionTL + object->width;
+
+    double nextYPositionBL = nextYPositionTL + object->height;
+    double nextXPositionBL = nextXPositionTL;
+
+    double nextYPositionBR = nextYPositionTL + object->height;
+    double nextXPositionBR = nextXPositionTL + object->width;
+
+    GameObject *colliderTL = GetCollider(object, nextXPositionTL, nextYPositionTL);
+    GameObject *colliderTR = GetCollider(object, nextXPositionTR, nextYPositionTR);
+    GameObject *colliderBL = GetCollider(object, nextXPositionBL, nextYPositionBL);
+    GameObject *colliderBR = GetCollider(object, nextXPositionBR, nextYPositionBR);
+
+    /*
+    Pass collisions into function
+    check what kind of collision we have
+        - border
+        - corner
+    Then invert the appropriate part of the velocity vector and possibly multiply the bounce variable.
+    Block any further inversions of that vector part.
+    */
+
+    SDL_Delay(10);
+}
+
+GameObject *GetCollider(GameObject *collidingObject, double xPosition, double yPosition)
+{
+    for (int i = 0; i < gameObjects->Length; i++)
+    {
+        GameObject *possibleColliderObject = gameObjects->at(gameObjects, i);
+        if (possibleColliderObject == collidingObject)
+        {
+            continue;
+        }
+
+        double possibleColliderBoundaryTop = possibleColliderObject->position_y;
+        double possibleColliderBoundaryLeft = possibleColliderObject->position_x;
+        double possibleColliderBoundaryRight = possibleColliderBoundaryLeft + possibleColliderObject->width;
+        double possibleColliderBoundaryBottom = possibleColliderBoundaryTop + possibleColliderObject->height;
+
+        if (possibleColliderBoundaryLeft <= xPosition && xPosition <= possibleColliderBoundaryRight)
+        {
+            return possibleColliderObject;
+        }
+        if (possibleColliderBoundaryTop <= yPosition && yPosition <= possibleColliderBoundaryBottom)
+        {
+            return possibleColliderObject;
         }
     }
 }
