@@ -123,6 +123,10 @@ void KinematicTick(GameObject *currentGameObject)
 
 void CollisionChecks(GameObject *object)
 {
+    if (object->isKinematic == false || (object->velocity_x == 0 && object->velocity_y == 0))
+    {
+        return;
+    }
     double nextYPositionTL = object->position_y + object->velocity_y * Time_DeltaTime;
     double nextXPositionTL = object->position_x + object->velocity_x * Time_DeltaTime;
 
@@ -154,25 +158,23 @@ void CollisionChecks(GameObject *object)
 
     if (colliderTL != NULL && !(IsPositionInObject(colliderTL, xPositionTL, yPositionTL)))
     {
-        HandleCollision(object, colliderTL, round(nextXPositionTL), round(nextYPositionTL), xPositionTL, yPositionTL);
+        HandleCollision(object, colliderTL, nextXPositionTL, nextYPositionTL, xPositionTL, yPositionTL);
     }
 
     if (colliderTR != NULL && !(IsPositionInObject(colliderTR, xPositionTR, yPositionTR)))
     {
-        HandleCollision(object, colliderTR, round(nextXPositionTR), round(nextYPositionTR), xPositionTR, yPositionTR);
+        HandleCollision(object, colliderTR, nextXPositionTR, nextYPositionTR, xPositionTR, yPositionTR);
     }
 
     if (colliderBL != NULL && !(IsPositionInObject(colliderBL, xPositionBL, yPositionBL)))
     {
-        HandleCollision(object, colliderBL, round(nextXPositionBL), round(nextYPositionBL), xPositionBL, yPositionBL);
+        HandleCollision(object, colliderBL, nextXPositionBL, nextYPositionBL, xPositionBL, yPositionBL);
     }
 
     if (colliderBR != NULL && !(IsPositionInObject(colliderBR, xPositionBR, yPositionBR)))
     {
-        HandleCollision(object, colliderBR, round(nextXPositionBR), round(nextYPositionBR), xPositionBR, yPositionBR);
+        HandleCollision(object, colliderBR, nextXPositionBR, nextYPositionBR, xPositionBR, yPositionBR);
     }
-
-    SDL_Delay(10);
 }
 
 GameObject *GetCollider(GameObject *collidingObject, double xPosition, double yPosition)
@@ -209,7 +211,7 @@ bool IsPositionInObject(GameObject *collider, double positionX, double positionY
     return false;
 }
 
-void HandleCollision(GameObject *object, GameObject *collider, int nextCornerPositionX, int nextCornerPositionY, int cornerPositionX, int cornerPositionY)
+void HandleCollision(GameObject *object, GameObject *collider, double nextCornerPositionX, double nextCornerPositionY, double cornerPositionX, double cornerPositionY)
 {
     enum CollisionDirection collisionDirection = RecursivelyGetCollisionDirection(object, collider, nextCornerPositionX, nextCornerPositionY, 1, 1, cornerPositionX, cornerPositionY);
     switch (collisionDirection)
@@ -230,28 +232,28 @@ void HandleCollision(GameObject *object, GameObject *collider, int nextCornerPos
         */
 
     case Direction_Bottom:
-        printf("Collision from bottom!");
+        printf("Collision from bottom!\n");
         break;
     case Direction_Top:
-        printf("Collision from top!");
+        printf("Collision from top!\n");
         break;
     case Direction_Right:
-        printf("Collision from right!");
+        printf("Collision from right!\n");
         break;
     case Direction_Left:
-        printf("Collision from left!");
+        printf("Collision from left!\n");
         break;
     case Corner_BL:
-        printf("Collision from bottom-left!");
+        printf("Collision from bottom-left!\n");
         break;
     case Corner_BR:
-        printf("Collision from bottom-right!");
+        printf("Collision from bottom-right!\n");
         break;
     case Corner_TL:
-        printf("Collision from top-left!");
+        printf("Collision from top-left!\n");
         break;
     case Corner_TR:
-        printf("Collision from top-right!");
+        printf("Collision from top-right!\n");
         break;
 
     default:
@@ -259,9 +261,9 @@ void HandleCollision(GameObject *object, GameObject *collider, int nextCornerPos
     }
 }
 
-enum CollisionDirection RecursivelyGetCollisionDirection(GameObject *object, GameObject *collider, int positionX, int positionY, int depth, double currentFactor, int cornerPositionX, int cornerPositionY)
+enum CollisionDirection RecursivelyGetCollisionDirection(GameObject *object, GameObject *collider, double positionX, double positionY, int depth, double currentFactor, double cornerPositionX, double cornerPositionY)
 {
-    enum CollisionDirection collisionDirection = CheckCollisionDirection(collider, positionX, positionY);
+    enum CollisionDirection collisionDirection = CheckCollisionDirection(collider, round(positionX), round(positionY));
 
     if (collisionDirection != None)
     {
@@ -269,8 +271,8 @@ enum CollisionDirection RecursivelyGetCollisionDirection(GameObject *object, Gam
     }
     else
     {
-        int nextCheckPositionX = 0;
-        int nextCheckPositionY = 0;
+        double nextCheckPositionX = 0;
+        double nextCheckPositionY = 0;
 
         if (IsPositionInObject(collider, positionX, positionY))
         {
@@ -282,8 +284,8 @@ enum CollisionDirection RecursivelyGetCollisionDirection(GameObject *object, Gam
         }
         depth++;
 
-        nextCheckPositionX = round(cornerPositionX + object->velocity_x * Time_DeltaTime * currentFactor);
-        nextCheckPositionY = round(cornerPositionY + object->velocity_y * Time_DeltaTime * currentFactor);
+        nextCheckPositionX = cornerPositionX + object->velocity_x * Time_DeltaTime * currentFactor;
+        nextCheckPositionY = cornerPositionY + object->velocity_y * Time_DeltaTime * currentFactor;
 
         return RecursivelyGetCollisionDirection(object, collider, nextCheckPositionX, nextCheckPositionY, depth, currentFactor, cornerPositionX, cornerPositionY);
     }
@@ -295,54 +297,54 @@ enum CollisionDirection CheckCollisionDirection(GameObject *object, int position
     double objectXPositionTL = object->position_x;
 
     double objectYPositionTR = objectYPositionTL;
-    double objectXPositionTR = objectXPositionTL + object->width;
+    double objectXPositionTR = objectXPositionTL + object->width - 1;
 
-    double objectYPositionBL = objectYPositionTL + object->height;
+    double objectYPositionBL = objectYPositionTL + object->height - 1;
     double objectXPositionBL = objectXPositionTL;
 
-    double objectYPositionBR = objectYPositionTL + object->height;
-    double objectXPositionBR = objectXPositionTL + object->width;
+    double objectYPositionBR = objectYPositionTL + object->height - 1;
+    double objectXPositionBR = objectXPositionTL + object->width - 1;
 
-    if (objectXPositionTL == positionX && objectYPositionTL == positionY)
+    if (round(objectXPositionTL) == positionX && round(objectYPositionTL) == positionY)
     {
         return Corner_TL;
     }
-    if (objectXPositionTR == positionX && objectYPositionTR == positionY)
+    if (round(objectXPositionTR) == positionX && round(objectYPositionTR) == positionY)
     {
         return Corner_TR;
     }
-    if (objectXPositionBL == positionX && objectYPositionBL == positionY)
+    if (round(objectXPositionBL) == positionX && round(objectYPositionBL) == positionY)
     {
         return Corner_BL;
     }
-    if (objectXPositionBR == positionX && objectYPositionBR == positionY)
+    if (round(objectXPositionBR) == positionX && round(objectYPositionBR) == positionY)
     {
         return Corner_BR;
     }
 
     // Right edge
-    if (positionX == objectXPositionBR &&
+    if (positionX == round(objectXPositionBR) &&
         positionY > objectYPositionTR &&
         positionY < objectYPositionBR)
     {
         return Direction_Right;
     }
     // Left edge
-    if (positionX == objectXPositionBL &&
+    if (positionX == round(objectXPositionBL) &&
         positionY > objectYPositionTL &&
         positionY < objectYPositionBL)
     {
         return Direction_Left;
     }
     // Top edge
-    if (positionY == objectYPositionTR &&
+    if (positionY == round(objectYPositionTR) &&
         positionX > objectXPositionTL &&
         positionX < objectXPositionTR)
     {
         return Direction_Top;
     }
     // Bottom edge
-    if (positionY == objectYPositionBR &&
+    if (positionY == round(objectYPositionBR) &&
         positionX > objectXPositionBL &&
         positionX < objectXPositionBR)
     {

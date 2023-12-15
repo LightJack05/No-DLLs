@@ -10,9 +10,9 @@ void GravityTick(GameObject *currentGameObject);
 void CollisionChecks(GameObject *object);
 GameObject *GetCollider(GameObject *collidingObject, double xPosition, double yPosition);
 bool IsPositionInObject(GameObject *collider, double positionX, double positionY);
-void HandleCollision(GameObject *object, GameObject *collider, int nextCornerPositionX, int nextCornerPositionY, int cornerPositionX, int cornerPositionY);
+void HandleCollision(GameObject *object, GameObject *collider, double nextCornerPositionX, double nextCornerPositionY, double cornerPositionX, double cornerPositionY);
 
-enum CollisionDirection RecursivelyGetCollisionDirection(GameObject *object, GameObject *collider, int positionX, int positionY, int depth, double currentFactor, int cornerPositionX, int cornerPositionY);
+enum CollisionDirection RecursivelyGetCollisionDirection(GameObject *object, GameObject *collider, double positionX, double positionY, int depth, double currentFactor, double cornerPositionX, double cornerPositionY);
 
 enum CollisionDirection CheckCollisionDirection(GameObject *object, int positionX, int positionY);
 
