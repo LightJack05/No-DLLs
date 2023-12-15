@@ -10,7 +10,6 @@ void UpdateRenderer(SDL_Renderer *renderer)
 {
     UpdateDeltaTime();
     UpdateSpritePositionsFromGameObjects();
-    printf("%d\n", Time_DeltaTime);
     // Initialize renderer color white for the background
     SDL_SetRenderDrawColor(renderer, 0x12, 0x12, 0x12, 0xFF);
     // 181818
@@ -136,20 +135,42 @@ void CollisionChecks(GameObject *object)
     double nextYPositionBR = nextYPositionTL + object->height;
     double nextXPositionBR = nextXPositionTL + object->width;
 
+    double yPositionTL = object->position_y;
+    double xPositionTL = object->position_x;
+
+    double yPositionTR = yPositionTL;
+    double xPositionTR = xPositionTL + object->width;
+
+    double yPositionBL = yPositionTL + object->height;
+    double xPositionBL = xPositionTL;
+
+    double yPositionBR = yPositionTL + object->height;
+    double xPositionBR = xPositionTL + object->width;
+
     GameObject *colliderTL = GetCollider(object, nextXPositionTL, nextYPositionTL);
     GameObject *colliderTR = GetCollider(object, nextXPositionTR, nextYPositionTR);
     GameObject *colliderBL = GetCollider(object, nextXPositionBL, nextYPositionBL);
     GameObject *colliderBR = GetCollider(object, nextXPositionBR, nextYPositionBR);
 
-    /*
-    Pass collisions into function
-    check what kind of collision we have
-        - border
-        - corner
-    (Half movement every time, binary search.)
-    Then invert the appropriate part of the velocity vector and possibly multiply the bounce variable.
-    Block any further inversions of that vector part.
-    */
+    if (colliderTL != NULL && !(IsPositionInObject(colliderTL, xPositionTL, yPositionTL)))
+    {
+        HandleCollision(object, colliderTL, round(nextXPositionTL), round(nextYPositionTL), xPositionTL, yPositionTL);
+    }
+
+    if (colliderTR != NULL && !(IsPositionInObject(colliderTR, xPositionTR, yPositionTR)))
+    {
+        HandleCollision(object, colliderTR, round(nextXPositionTR), round(nextYPositionTR), xPositionTR, yPositionTR);
+    }
+
+    if (colliderBL != NULL && !(IsPositionInObject(colliderBL, xPositionBL, yPositionBL)))
+    {
+        HandleCollision(object, colliderBL, round(nextXPositionBL), round(nextYPositionBL), xPositionBL, yPositionBL);
+    }
+
+    if (colliderBR != NULL && !(IsPositionInObject(colliderBR, xPositionBR, yPositionBR)))
+    {
+        HandleCollision(object, colliderBR, round(nextXPositionBR), round(nextYPositionBR), xPositionBR, yPositionBR);
+    }
 
     SDL_Delay(10);
 }
@@ -163,19 +184,169 @@ GameObject *GetCollider(GameObject *collidingObject, double xPosition, double yP
         {
             continue;
         }
-
-        double possibleColliderBoundaryTop = possibleColliderObject->position_y;
-        double possibleColliderBoundaryLeft = possibleColliderObject->position_x;
-        double possibleColliderBoundaryRight = possibleColliderBoundaryLeft + possibleColliderObject->width;
-        double possibleColliderBoundaryBottom = possibleColliderBoundaryTop + possibleColliderObject->height;
-
-        if (possibleColliderBoundaryLeft <= xPosition && xPosition <= possibleColliderBoundaryRight)
-        {
-            return possibleColliderObject;
-        }
-        if (possibleColliderBoundaryTop <= yPosition && yPosition <= possibleColliderBoundaryBottom)
+        if (IsPositionInObject(possibleColliderObject, xPosition, yPosition))
         {
             return possibleColliderObject;
         }
     }
+    return NULL;
+}
+
+bool IsPositionInObject(GameObject *collider, double positionX, double positionY)
+{
+    double colliderBoundaryTop = collider->position_y;
+    double colliderBoundaryLeft = collider->position_x;
+    double colliderBoundaryRight = colliderBoundaryLeft + collider->width - 1;
+    double colliderBoundaryBottom = colliderBoundaryTop + collider->height - 1;
+
+    if (colliderBoundaryLeft <= positionX &&
+        positionX <= colliderBoundaryRight &&
+        colliderBoundaryTop <= positionY &&
+        positionY <= colliderBoundaryBottom)
+    {
+        return true;
+    }
+    return false;
+}
+
+void HandleCollision(GameObject *object, GameObject *collider, int nextCornerPositionX, int nextCornerPositionY, int cornerPositionX, int cornerPositionY)
+{
+    enum CollisionDirection collisionDirection = RecursivelyGetCollisionDirection(object, collider, nextCornerPositionX, nextCornerPositionY, 1, 1, cornerPositionX, cornerPositionY);
+    switch (collisionDirection)
+    {
+
+        /*
+        Elastic collisions:
+        - Add mass property
+        - Add bounciess property
+        - Add mass/surface area to gravity function (drag)
+        - if other collider is not kinematic
+        -> invert velocity vector
+        - else
+        -> caluclate new velocity for both objects
+        ---> https://en.wikipedia.org/wiki/Elastic_collision
+        ---> include bounciness of both objects
+        - Handle bounciness 0?
+        */
+
+    case Direction_Bottom:
+        printf("Collision from bottom!");
+        break;
+    case Direction_Top:
+        printf("Collision from top!");
+        break;
+    case Direction_Right:
+        printf("Collision from right!");
+        break;
+    case Direction_Left:
+        printf("Collision from left!");
+        break;
+    case Corner_BL:
+        printf("Collision from bottom-left!");
+        break;
+    case Corner_BR:
+        printf("Collision from bottom-right!");
+        break;
+    case Corner_TL:
+        printf("Collision from top-left!");
+        break;
+    case Corner_TR:
+        printf("Collision from top-right!");
+        break;
+
+    default:
+        break;
+    }
+}
+
+enum CollisionDirection RecursivelyGetCollisionDirection(GameObject *object, GameObject *collider, int positionX, int positionY, int depth, double currentFactor, int cornerPositionX, int cornerPositionY)
+{
+    enum CollisionDirection collisionDirection = CheckCollisionDirection(collider, positionX, positionY);
+
+    if (collisionDirection != None)
+    {
+        return collisionDirection;
+    }
+    else
+    {
+        int nextCheckPositionX = 0;
+        int nextCheckPositionY = 0;
+
+        if (IsPositionInObject(collider, positionX, positionY))
+        {
+            currentFactor -= 1.0 / pow(2, depth);
+        }
+        else
+        {
+            currentFactor += 1.0 / pow(2, depth);
+        }
+        depth++;
+
+        nextCheckPositionX = round(cornerPositionX + object->velocity_x * Time_DeltaTime * currentFactor);
+        nextCheckPositionY = round(cornerPositionY + object->velocity_y * Time_DeltaTime * currentFactor);
+
+        return RecursivelyGetCollisionDirection(object, collider, nextCheckPositionX, nextCheckPositionY, depth, currentFactor, cornerPositionX, cornerPositionY);
+    }
+}
+
+enum CollisionDirection CheckCollisionDirection(GameObject *object, int positionX, int positionY)
+{
+    double objectYPositionTL = object->position_y;
+    double objectXPositionTL = object->position_x;
+
+    double objectYPositionTR = objectYPositionTL;
+    double objectXPositionTR = objectXPositionTL + object->width;
+
+    double objectYPositionBL = objectYPositionTL + object->height;
+    double objectXPositionBL = objectXPositionTL;
+
+    double objectYPositionBR = objectYPositionTL + object->height;
+    double objectXPositionBR = objectXPositionTL + object->width;
+
+    if (objectXPositionTL == positionX && objectYPositionTL == positionY)
+    {
+        return Corner_TL;
+    }
+    if (objectXPositionTR == positionX && objectYPositionTR == positionY)
+    {
+        return Corner_TR;
+    }
+    if (objectXPositionBL == positionX && objectYPositionBL == positionY)
+    {
+        return Corner_BL;
+    }
+    if (objectXPositionBR == positionX && objectYPositionBR == positionY)
+    {
+        return Corner_BR;
+    }
+
+    // Right edge
+    if (positionX == objectXPositionBR &&
+        positionY > objectYPositionTR &&
+        positionY < objectYPositionBR)
+    {
+        return Direction_Right;
+    }
+    // Left edge
+    if (positionX == objectXPositionBL &&
+        positionY > objectYPositionTL &&
+        positionY < objectYPositionBL)
+    {
+        return Direction_Left;
+    }
+    // Top edge
+    if (positionY == objectYPositionTR &&
+        positionX > objectXPositionTL &&
+        positionX < objectXPositionTR)
+    {
+        return Direction_Top;
+    }
+    // Bottom edge
+    if (positionY == objectYPositionBR &&
+        positionX > objectXPositionBL &&
+        positionX < objectXPositionBR)
+    {
+        return Direction_Bottom;
+    }
+    return None;
 }
