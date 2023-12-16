@@ -53,6 +53,13 @@ void UpdateSpritePositionsFromGameObjects()
     for (int i = 0; i < gameObjects->Length; i++)
     {
         GameObjectPtr currentGameObject = ((GameObjectPtr)(gameObjects->at(gameObjects, i)));
+        currentGameObject->blockOtherXBounces = false;
+        currentGameObject->blockOtherYBounces = false;
+    }
+
+    for (int i = 0; i < gameObjects->Length; i++)
+    {
+        GameObjectPtr currentGameObject = ((GameObjectPtr)(gameObjects->at(gameObjects, i)));
         GravityTick(currentGameObject);
         KinematicTick(currentGameObject);
 
@@ -91,13 +98,15 @@ void KinematicTick(GameObject *currentGameObject)
 
         if ((nextXPosition > (SCREEN_WIDTH - (currentGameObject->width))) && currentGameObject->respectScreenEdgeRight)
         {
-            currentGameObject->position_x = SCREEN_WIDTH - (currentGameObject->width);
-            currentGameObject->velocity_x = 0;
+            currentGameObject->blockOtherXBounces = true;
+            currentGameObject->position_x = (SCREEN_WIDTH - (currentGameObject->width));
+            currentGameObject->velocity_x = -(fabs(currentGameObject->velocity_x)) * (currentGameObject->screenEdgeBounciness);
         }
         else if (nextXPosition < 0 && currentGameObject->respectScreenEdgeLeft)
         {
+            currentGameObject->blockOtherXBounces = true;
             currentGameObject->position_x = 0;
-            currentGameObject->velocity_x = 0;
+            currentGameObject->velocity_x = (fabs(currentGameObject->velocity_x)) * (currentGameObject->screenEdgeBounciness);
         }
         else
         {
@@ -107,12 +116,14 @@ void KinematicTick(GameObject *currentGameObject)
         if ((nextYPosition > (SCREEN_HEIGHT - (currentGameObject->height))) && currentGameObject->respectScreenEdgeBottom)
         {
             currentGameObject->position_y = SCREEN_HEIGHT - (currentGameObject->height);
-            currentGameObject->velocity_y = 0;
+            currentGameObject->blockOtherYBounces = true;
+            currentGameObject->velocity_y = -(fabs(currentGameObject->velocity_y)) * (currentGameObject->screenEdgeBounciness);
         }
         else if (nextYPosition < 0 && currentGameObject->respectScreenEdgeTop)
         {
             currentGameObject->position_y = 0;
-            currentGameObject->velocity_y = 0;
+            currentGameObject->blockOtherYBounces = true;
+            currentGameObject->velocity_y = (fabs(currentGameObject->velocity_y)) * (currentGameObject->screenEdgeBounciness);
         }
         else
         {
@@ -214,6 +225,8 @@ bool IsPositionInObject(GameObject *collider, double positionX, double positionY
 void HandleCollision(GameObject *object, GameObject *collider, double nextCornerPositionX, double nextCornerPositionY, double cornerPositionX, double cornerPositionY)
 {
     enum CollisionDirection collisionDirection = RecursivelyGetCollisionDirection(object, collider, nextCornerPositionX, nextCornerPositionY, 1, 1, cornerPositionX, cornerPositionY);
+    UpdateVelocitiesAfterCollision(object, collider, collisionDirection);
+
     switch (collisionDirection)
     {
 
@@ -225,7 +238,7 @@ void HandleCollision(GameObject *object, GameObject *collider, double nextCorner
         - if other collider is not kinematic
         -> invert velocity vector
         - else
-        -> caluclate new velocity for both objects
+        -> calculate new velocity for both objects
         ---> https://en.wikipedia.org/wiki/Elastic_collision
         ---> include bounciness of both objects
         - Handle bounciness 0?
@@ -255,7 +268,9 @@ void HandleCollision(GameObject *object, GameObject *collider, double nextCorner
     case Corner_TR:
         printf("Collision from top-right!\n");
         break;
-
+    case None:
+        printf("Clip!");
+        break;
     default:
         break;
     }
@@ -264,6 +279,10 @@ void HandleCollision(GameObject *object, GameObject *collider, double nextCorner
 enum CollisionDirection RecursivelyGetCollisionDirection(GameObject *object, GameObject *collider, double positionX, double positionY, int depth, double currentFactor, double cornerPositionX, double cornerPositionY)
 {
     enum CollisionDirection collisionDirection = CheckCollisionDirection(collider, round(positionX), round(positionY));
+    if (depth > 1000)
+    {
+        return None;
+    }
 
     if (collisionDirection != None)
     {
@@ -351,4 +370,116 @@ enum CollisionDirection CheckCollisionDirection(GameObject *object, int position
         return Direction_Bottom;
     }
     return None;
+}
+
+void UpdateVelocitiesAfterCollision(GameObject *objectOne, GameObject *objectTwo, CollisionDirection direction)
+{
+    if (objectOne->isKinematic == false)
+    {
+        UpdateVelocitiesAfterNonKinematicCollision(objectTwo, objectOne, direction);
+    }
+    if (objectTwo->isKinematic == false)
+    {
+        UpdateVelocitiesAfterNonKinematicCollision(objectOne, objectTwo, direction);
+    }
+    if (objectOne->isKinematic == true && objectTwo->isKinematic == true)
+    {
+        ElasticCollision(objectOne, objectTwo, direction);
+    }
+}
+
+void ElasticCollision(GameObject *objectOne, GameObject *objectTwo, CollisionDirection direction)
+{
+    switch (direction)
+    {
+    case Direction_Bottom:
+    case Direction_Top:
+        if (!(objectOne->blockOtherXBounces || objectTwo->blockOtherXBounces))
+        {
+            UpdateVelocitiesAfterElasticCollision(&(objectOne->velocity_y), &(objectTwo->velocity_y), objectOne->mass, objectTwo->mass);
+            objectOne->blockOtherXBounces = true;
+            objectTwo->blockOtherXBounces = true;
+        }
+        break;
+    case Direction_Right:
+    case Direction_Left:
+        if (!(objectOne->blockOtherYBounces || objectTwo->blockOtherYBounces))
+        {
+            UpdateVelocitiesAfterElasticCollision(&(objectOne->velocity_x), &(objectTwo->velocity_x), objectOne->mass, objectTwo->mass);
+            objectOne->blockOtherXBounces = true;
+            objectTwo->blockOtherXBounces = true;
+        }
+        break;
+    case Corner_BL:
+    case Corner_BR:
+    case Corner_TL:
+    case Corner_TR:
+        if (!(objectOne->blockOtherXBounces || objectTwo->blockOtherXBounces))
+        {
+            UpdateVelocitiesAfterElasticCollision(&(objectOne->velocity_y), &(objectTwo->velocity_y), objectOne->mass, objectTwo->mass);
+        }
+        if (!(objectOne->blockOtherYBounces || objectTwo->blockOtherYBounces))
+        {
+            UpdateVelocitiesAfterElasticCollision(&(objectOne->velocity_x), &(objectTwo->velocity_x), objectOne->mass, objectTwo->mass);
+        }
+        objectOne->blockOtherXBounces = true;
+        objectTwo->blockOtherXBounces = true;
+        break;
+
+    default:
+        break;
+    }
+}
+
+void UpdateVelocitiesAfterElasticCollision(double *relevantVelocityOne, double *relevantVelocityTwo, double massOne, double massTwo)
+{
+    double oldVelocityOne = *relevantVelocityOne;
+    double oldVelocityTwo = *relevantVelocityTwo;
+
+    *relevantVelocityOne = (((massOne - massTwo) / (massOne + massTwo)) * oldVelocityOne) + (((2 * massTwo) / (massOne + massTwo)) * oldVelocityTwo);
+
+    *relevantVelocityTwo = (((2 * massOne) / (massOne + massTwo)) * oldVelocityOne) + (((massTwo - massOne) / (massOne + massTwo)) * oldVelocityTwo);
+}
+
+void UpdateVelocitiesAfterNonKinematicCollision(GameObject *object, GameObject *staticObject, CollisionDirection direction)
+{
+    switch (direction)
+    {
+    case Direction_Bottom:
+    case Direction_Top:
+        BounceYVelocity(object, staticObject);
+        break;
+    case Direction_Right:
+    case Direction_Left:
+        BounceXVelocity(object, staticObject);
+        break;
+    case Corner_BL:
+    case Corner_BR:
+    case Corner_TL:
+    case Corner_TR:
+        BounceYVelocity(object, staticObject);
+        BounceXVelocity(object, staticObject);
+        break;
+
+    default:
+        break;
+    }
+}
+
+void BounceXVelocity(GameObject *object, GameObject *staticObject)
+{
+    if (!(object->blockOtherXBounces))
+    {
+        object->blockOtherXBounces = true;
+        object->velocity_x = -(object->velocity_x) * ((object->bounciness + staticObject->bounciness) / 2);
+    }
+}
+
+void BounceYVelocity(GameObject *object, GameObject *staticObject)
+{
+    if (!(object->blockOtherYBounces))
+    {
+        object->blockOtherYBounces = true;
+        object->velocity_y = -(object->velocity_y) * ((object->bounciness + staticObject->bounciness) / 2);
+    }
 }

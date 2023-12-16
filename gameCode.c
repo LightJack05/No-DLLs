@@ -23,18 +23,21 @@ void InitPlayer()
 {
     player = NewRectangle();
 
-    player->width = 20.0;
-    player->height = 20.0;
+    player->width = 40.0;
+    player->height = 40.0;
 
-    player->position_x = 100.0;
-    player->position_y = 120.0;
+    player->position_x = 800;
+    player->position_y = 1000;
 
     player->usesGravity = false;
     player->isKinematic = true;
     player->hasCollider = true;
+    player->bounciness = 1;
+    player->screenEdgeBounciness = 1.1;
+    player->mass = 5;
 
-    player->velocity_x = 0.01;
-    player->velocity_y = 0.0;
+    player->velocity_x = 0;
+    player->velocity_y = -0.3;
 
     player->color_r = 255;
 }
@@ -45,12 +48,15 @@ void CreateFloor()
     collider->hasCollider = true;
     collider->isKinematic = true;
     collider->color_b = 255;
-    collider->width = 20.0;
-    collider->height = 80.0;
-    collider->position_x = 145.0;
-    collider->position_y = 125.0;
-    collider->velocity_x = -0.005;
-    collider->velocity_y = 0.0;
+    collider->width = 40;
+    collider->height = 40;
+    collider->position_x = 800;
+    collider->position_y = 200;
+    collider->velocity_x = 0;
+    collider->velocity_y = 0;
+    collider->bounciness = 1;
+    collider->screenEdgeBounciness = 1;
+    collider->mass = 5;
 }
 
 void ControlMovements()

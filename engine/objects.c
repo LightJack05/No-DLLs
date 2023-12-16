@@ -34,11 +34,16 @@ GameObject *NewRectangle()
 
     newObject->hasCollider = false;
     newObject->bounciness = 0;
+    newObject->mass = 0;
+
+    newObject->blockOtherXBounces = false;
+    newObject->blockOtherYBounces = false;
 
     newObject->respectScreenEdgeBottom = true;
     newObject->respectScreenEdgeTop = true;
     newObject->respectScreenEdgeLeft = true;
     newObject->respectScreenEdgeRight = true;
+    newObject->screenEdgeBounciness = 0;
 
     newObject->color_r = 0;
     newObject->color_b = 0;

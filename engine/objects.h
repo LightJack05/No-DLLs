@@ -31,6 +31,10 @@ struct gameObject
 
     bool hasCollider;
     double bounciness;
+    double mass;
+
+    bool blockOtherXBounces;
+    bool blockOtherYBounces;
 
     unsigned char color_r;
     unsigned char color_g;
@@ -40,6 +44,7 @@ struct gameObject
     bool respectScreenEdgeTop;
     bool respectScreenEdgeRight;
     bool respectScreenEdgeLeft;
+    double screenEdgeBounciness;
 
     enum ObjectType objectType;
 
