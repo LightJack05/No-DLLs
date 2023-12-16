@@ -9,8 +9,11 @@ GameObject *player;
 
 void Start()
 {
-    InitPlayer();
-    CreateFloor();
+    // InitPlayer();
+    for (int i = 0; i < 10; i++)
+    {
+        CreateRubberBall();
+    }
 }
 
 /// @brief Update will run every Frame.
@@ -29,11 +32,11 @@ void InitPlayer()
     player->position_x = 800;
     player->position_y = 1000;
 
-    player->usesGravity = false;
+    player->usesGravity = true;
     player->isKinematic = true;
     player->hasCollider = true;
     player->bounciness = 1;
-    player->screenEdgeBounciness = 1.1;
+    player->screenEdgeBounciness = 1;
     player->mass = 5;
 
     player->velocity_x = 0;
@@ -42,18 +45,19 @@ void InitPlayer()
     player->color_r = 255;
 }
 
-void CreateFloor()
+void CreateRubberBall()
 {
     GameObject *collider = NewRectangle();
+    collider->usesGravity = true;
     collider->hasCollider = true;
     collider->isKinematic = true;
     collider->color_b = 255;
     collider->width = 40;
     collider->height = 40;
-    collider->position_x = 800;
-    collider->position_y = 200;
-    collider->velocity_x = 0;
-    collider->velocity_y = 0;
+    collider->position_x = rand() % 800;
+    collider->position_y = rand() % 800;
+    collider->velocity_x = (rand() % 1000) / (double)1000;
+    collider->velocity_y = (rand() % 1000) / (double)1000;
     collider->bounciness = 1;
     collider->screenEdgeBounciness = 1;
     collider->mass = 5;
@@ -65,26 +69,24 @@ void ControlMovements()
     {
     }
 
-    if (Controls_D)
+    if (Controls_DDown)
     {
-        player->velocity_x = 0.5;
+        player->velocity_x += 0.5;
     }
     if (Controls_DUp)
     {
-        player->velocity_x = 0;
     }
 
     if (Controls_WDown || Controls_SpaceDown)
     {
-        player->velocity_y = -0.5;
+        player->velocity_y += -0.5;
     }
 
-    if (Controls_A)
+    if (Controls_ADown)
     {
-        player->velocity_x = -0.5;
+        player->velocity_x += -0.5;
     }
     if (Controls_AUp)
     {
-        player->velocity_x = 0;
     }
 }

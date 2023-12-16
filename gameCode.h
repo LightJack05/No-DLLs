@@ -4,7 +4,7 @@
 void Start();
 void Update();
 void InitPlayer();
-void CreateFloor();
+void CreateRubberBall();
 void ControlMovements();
 
 #endif // GAMECODE_H
